@@ -1,0 +1,8 @@
+{
+  "expected_uuid": null,
+  "top_leds": 37,
+  "left_leds": 21,
+  "right_leds": 21,
+  "udp_port": 5568,
+  "brightness": 255
+}

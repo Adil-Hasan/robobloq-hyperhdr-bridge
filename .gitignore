@@ -1,0 +1,12 @@
+.venv/
+deps/
+__pycache__/
+*.py[cod]
+config.json
+config.local*.json
+*.log*
+status.json
+status.tmp
+process-id.txt
+stop.request
+*.zip
