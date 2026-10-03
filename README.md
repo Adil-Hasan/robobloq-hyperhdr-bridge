@@ -91,7 +91,23 @@ The tested controller reports 254 addressable positions despite only 79 being us
 
 Saved HyperHDR settings and local `config.json` persist. Start HyperHDR and **Start screen sync.cmd**. OpenRGB remains closed.
 
-This repository does not install startup tasks. To start automatically at login, first test the setup for a longer gaming session. Then press **Win+R**, enter `shell:startup`, and add shortcuts to HyperHDR and **Start screen sync.cmd**. The bridge waits for HyperHDR and retries if the strip is temporarily missing. Remove those shortcuts to undo startup. Moving the repository folder requires updating the shortcuts and rerunning Setup.cmd, since Python virtual environments are not portable.
+To start automatically at sign-in, first test the setup for a longer gaming session, then double-click **Enable startup.cmd**. It adds a startup entry for your Windows user, using the repository's windowless Python executable. No administrator rights or PowerShell execution-policy changes are needed. Setup.cmd does not enable startup by itself.
+
+The installer keeps an existing HyperHDR startup entry. If none exists and HyperHDR is installed under `Program Files\HyperHDR\bin`, it adds one. For another installation location, run:
+
+```powershell
+.venv\Scripts\python.exe startup_install.py --install --hyperhdr "D:\Apps\HyperHDR\bin\hyperhdr.exe"
+```
+
+HyperHDR loads its saved configuration, including capture FPS, hardware acceleration, output controller and three-border layout. Click **Save settings** after changes in its web interface. The bridge waits for HyperHDR and retries if the strip is temporarily missing; startup order does not matter. If a bridge already owns the configured UDP port, the hidden launcher skips starting a second copy. `startup.log` records the launch or skip result.
+
+Double-click **Disable startup.cmd** to remove the bridge's sign-in entry. It does not stop a running bridge or disable HyperHDR startup. Use Stop screen sync.cmd to stop the current session, and HyperHDR's own startup setting or Windows Task Manager to disable HyperHDR separately.
+
+An earlier manual installation may use a `Robobloq screen sync.lnk` shortcut in `shell:startup`. Remove that shortcut when switching to this repository's startup installer. Do not keep both mechanisms enabled.
+
+Keep the repository folder and `.venv` at their current locations. If you move the folder or reinstall Python, rerun Setup.cmd and Enable startup.cmd. To verify startup, sign out and back in or reboot, check that HyperHDR and the bridge are running, and inspect `status.json` for `streaming`.
+
+OpenRGB can be uninstalled once the direct USB bridge has passed your hardware checks. It is no longer used by either HyperHDR or this bridge.
 
 ## Troubleshooting
 
@@ -106,6 +122,7 @@ This repository does not install startup tasks. To start automatically at login,
 | Low input FPS on a static desktop | Unchanged frames may arrive less often. Move a window or play video before judging throughput. |
 | Lag or delayed colours | Reduce capture FPS and check GPU load. The bridge discards queued frames and uses one-millisecond USB report pacing. |
 | Start shortcut exits immediately | Run `.venv\Scripts\python.exe bridge.py` in a terminal to see errors. Check configuration and Setup.cmd output. |
+| Nothing starts at sign-in | Run Enable startup.cmd again; check Windows Task Manager -> Startup apps and `startup.log`. Confirm HyperHDR startup is enabled and the repository folder has not moved. |
 
 Opening OpenRGB causes the bridge to pause USB control after its next process check, normally within ten seconds. For a clean handoff, stop the bridge before opening another controller. Probe, enrollment and colour tests should also be run with all streaming bridges stopped.
 
@@ -129,6 +146,8 @@ py -3 -m venv .venv
 .venv\Scripts\python.exe bridge.py --enroll
 .venv\Scripts\python.exe bridge.py --test-colors
 .venv\Scripts\python.exe bridge.py
+.venv\Scripts\python.exe startup_install.py --install
+.venv\Scripts\python.exe startup_install.py --remove
 ```
 
 Use `--config PATH` to load another local config file. Probe and enrollment issue only device-info commands. Colour testing and streaming also set brightness, stop built-in animation and send screen-colour commands. There are no firmware updates or commands to open the vendor's download URL.

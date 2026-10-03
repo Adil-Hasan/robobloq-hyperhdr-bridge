@@ -16,5 +16,5 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: python -m pip install -r requirements.txt
-      - run: python -m compileall -q bridge.py protocol.py settings.py manage.py
+      - run: python -m compileall -q bridge.py protocol.py settings.py manage.py startup.py startup_install.py
       - run: python -m unittest discover -p "test_*.py" -v
